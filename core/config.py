@@ -1,3 +1,5 @@
+from enum import Enum
+
 TILE_SIZE = 64
 COLS = 15
 ROWS = 13
@@ -16,6 +18,11 @@ BOMB_BOOST = 1
 BOMB_TIMER = 180  # 3 СЕКУНДЫ ПРИ 60 FPS
 EXPLOSION_DURATION = 30
 POWERUP_DROP_CHANCE = 0.3
+
+class TileType(Enum):
+    EMPTY = 0
+    SOFT_WALL = 1
+    HARD_WALL = 2
 
 COLOURS = {
     'RED': (255, 0, 0),

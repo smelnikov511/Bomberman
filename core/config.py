@@ -24,9 +24,16 @@ class TileType(Enum):
     SOFT_WALL = 1
     HARD_WALL = 2
 
+class Direction(Enum):
+    UP = (0, -1)
+    DOWN = (0, 1)
+    LEFT = (-1, 0)
+    RIGHT = (1, 0)
+    NONE = (0, 0)
+
 COLOURS = {
     'RED': (255, 0, 0),
-    'GREEN': (0, 255, 0),
+    'GREEN': (0, 100, 0),
     'BLUE': (0, 0, 255),
     'WHITE': (255, 255, 255),
     'BLACK': (0, 0, 0),

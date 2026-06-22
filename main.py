@@ -16,7 +16,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        screen.fill(COLOURS['BLACK'])
+        screen.fill(COLOURS['GREEN'])
         game_map.render(screen)
         pygame.display.flip()
         clock.tick(FPS)

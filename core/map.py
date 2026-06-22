@@ -27,7 +27,7 @@ class Map():
                 elif x % 2 == 0  and y % 2 == 0:
                     self.grid[x][y] = TileType.HARD_WALL
 
-        box_density = 0.75
+        box_density = 0.65
         for x in range(1, self.rows - 1):
             for y in range(1, self.cols - 1):
                 if (
@@ -47,7 +47,7 @@ class Map():
     def render(self, screen):
         for row in range(self.rows):
             for col in range(self.cols):
-                tile = self.grid[x][y]
+                tile = self.grid[row][col]
                 if tile != TileType.EMPTY:
                     px = col * tile_size
                     py = row * tile_size

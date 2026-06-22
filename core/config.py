@@ -3,8 +3,8 @@ from enum import Enum
 TILE_SIZE = 64
 COLS = 17
 ROWS = 15
-WINDOW_WIDTH = 960
-WINDOW_HEIGHT = 832
+WINDOW_WIDTH = 1088
+WINDOW_HEIGHT = 960
 
 FPS = 60
 
@@ -30,6 +30,6 @@ COLOURS = {
     'BLUE': (0, 0, 255),
     'WHITE': (255, 255, 255),
     'BLACK': (0, 0, 0),
-    'GRAY': (128, 128, 128),
+    'GREY': (128, 128, 128),
     'BROWN': (139, 69, 19)
 }

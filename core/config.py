@@ -31,6 +31,12 @@ class Direction(Enum):
     RIGHT = (1, 0)
     NONE = (0, 0)
 
+class GameState(Enum):
+    MENU = 0
+    PLAYING = 1
+    GAME_OVER = 2
+    PAUSE = 3
+
 COLOURS = {
     'RED': (255, 0, 0),
     'GREEN': (0, 100, 0),
@@ -40,5 +46,6 @@ COLOURS = {
     'GREY': (128, 128, 128),
     'BROWN': (139, 69, 19),
     'ORANGE': (255, 165, 0),
-    'YELLOW': (255, 255, 0)
+    'YELLOW': (255, 255, 0),
+    'PURPLE': (128, 0, 128)
 }

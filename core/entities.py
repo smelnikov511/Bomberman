@@ -3,7 +3,6 @@
 import pygame
 
 from .config import Direction, TileType, TILE_SIZE, PLAYER_SPEED, DEFAULT_BOMB_RANGE, DEFAULT_MAX_BOMB
-from .map import Map
 
 class Entity():
 
@@ -62,14 +61,6 @@ class Entity():
                 if not test_rect.colliderect(bomb_rect):
                     bomb.owner_can_pass = False
                 continue
-            if test_rect.colliderect(bomb_rect):
-                return True
-            bomb_rect = pygame.Rect(
-                bomb.col * TILE_SIZE,
-                bomb.row * TILE_SIZE,
-                TILE_SIZE,
-                TILE_SIZE
-            )
             if test_rect.colliderect(bomb_rect):
                 return True
             

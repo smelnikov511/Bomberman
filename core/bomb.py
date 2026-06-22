@@ -3,9 +3,7 @@
 import pygame
 
 from .config import TileType, BOMB_TIMER, COLOURS, POWERUP_DROP_CHANCE, TILE_SIZE
-from .entities import Entity
 from .explosion import Explosion
-from .map import Map
 
 
 class Bomb():

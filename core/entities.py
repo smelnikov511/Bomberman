@@ -17,6 +17,7 @@ class Entity():
         self.max_bombs = DEFAULT_MAX_BOMB
         self.active_bomb = 0
         self.alive = True
+        self.death_timer = 0
         self.colour = colour
         self.margin = 4
 
@@ -107,7 +108,10 @@ class Entity():
 
     def die(self):
         self.alive = False
+        self.death_timer = 120
     
     def render(self, screen):
+        if not self.alive and self.death_timer <= 0:
+            return
         colour = self.colour if self.alive else (0, 0, 0)
         pygame.draw.rect(screen, colour, self.rect())

@@ -28,16 +28,30 @@ class Enemy(Entity):
         self.path = []
         self.wander_timer = random.randint(30, 90)
 
-    def _choose_target(self, game_map, player, powerups):
-        best_pu = None
+    def _choose_target(self, game_map, players, enemies, powerups):
+        best_target = None
         best_dist = float('inf')
         for pu in powerups:
             d = abs(self.col - pu.col) + abs(self.row - pu.row)
             if d < best_dist:
                 best_dist = d
-                best_pu = pu
-        if best_pu and best_dist <= 4:
-            return (best_pu.col, best_pu.row)
+                best_target = (pu.col, pu.row)
+        for p in players:
+            if not p.alive:
+                continue
+            d = abs(self.col - p.col) + abs(self.row - p.row)
+            if d < best_dist:
+                best_dist = d
+                best_target = (p.col, p.row)
+        for e in enemies:
+            if e is self or not e.alive:
+                continue
+            d = abs(self.col - e.col) + abs(self.row - e.row)
+            if d < best_dist:
+                best_dist = d
+                best_target = (e.col, e.row)
+        if best_target and best_dist <= 4:
+            return best_target
         return None
 
     def _wall_nearby(self, game_map):
@@ -70,7 +84,7 @@ class Enemy(Entity):
                 queue.append((nc, nr))
         return None
 
-    def _should_place_bomb(self, game_map, player, bombs):
+    def _should_place_bomb(self, game_map, players, enemies, bombs):
         if self.active_bomb >= self.max_bombs:
             return False
         temp = Bomb(self.row, self.col, self.bomb_range, self)
@@ -79,9 +93,16 @@ class Enemy(Entity):
             return False
         if self._wall_nearby(game_map):
             return True
-        dist = abs(self.row - player.row) + abs(self.col - player.col)
-        if dist <= 2:
-            return True
+        for p in players:
+            if not p.alive:
+                continue
+            if abs(self.row - p.row) + abs(self.col - p.col) <= 2:
+                return True
+        for e in enemies:
+            if e is self or not e.alive:
+                continue
+            if abs(self.row - e.row) + abs(self.col - e.col) <= 2:
+                return True
         return False
 
     def _place_bomb(self):
@@ -133,7 +154,7 @@ class Enemy(Entity):
             self.direction = Direction.UP
         self._snap_to_grid()
 
-    def _update_state(self, game_map, bombs, player, powerups):
+    def _update_state(self, game_map, bombs, players, enemies, powerups):
         unsafe = not self._is_safe_tile(self.col, self.row, game_map, bombs)
 
         if unsafe:
@@ -150,7 +171,7 @@ class Enemy(Entity):
         if self.state == EnemyState.PLACE_BOMB:
             return
 
-        target = self._choose_target(game_map, player, powerups)
+        target = self._choose_target(game_map, players, enemies, powerups)
 
         if self.state == EnemyState.SEEK_TARGET:
             if not target:
@@ -161,7 +182,7 @@ class Enemy(Entity):
             return
 
         if self.state in (EnemyState.IDLE, EnemyState.WANDER):
-            if self._should_place_bomb(game_map, player, bombs):
+            if self._should_place_bomb(game_map, players, enemies, bombs):
                 self.state = EnemyState.PLACE_BOMB
                 return
             if target:
@@ -173,7 +194,7 @@ class Enemy(Entity):
             if self.state == EnemyState.IDLE:
                 self.state = EnemyState.WANDER
 
-    def _execute_state(self, game_map, bombs, player, powerups):
+    def _execute_state(self, game_map, bombs, players, enemies, powerups):
         if self.state == EnemyState.FLEE:
             if not self.path:
                 goal = self._find_nearest_safe_tile(game_map, bombs)
@@ -184,7 +205,7 @@ class Enemy(Entity):
 
         elif self.state == EnemyState.SEEK_TARGET:
             if not self.path:
-                target = self._choose_target(game_map, player, powerups)
+                target = self._choose_target(game_map, players, enemies, powerups)
                 if target:
                     result = AStar.find_path((self.col, self.row), target, game_map, bombs)
                     self.path = result if result else []
@@ -210,7 +231,7 @@ class Enemy(Entity):
             return
         self.path.clear()
 
-    def update(self, game_map, bombs, player, powerups):
+    def update(self, game_map, bombs, players, enemies, powerups):
         if not self.alive:
             return None
         self.bomb_cooldown = max(0, self.bomb_cooldown - 1)
@@ -220,8 +241,8 @@ class Enemy(Entity):
                 pu.apply(self)
                 powerups.remove(pu)
 
-        self._update_state(game_map, bombs, player, powerups)
-        self._execute_state(game_map, bombs, player, powerups)
+        self._update_state(game_map, bombs, players, enemies, powerups)
+        self._execute_state(game_map, bombs, players, enemies, powerups)
 
         while self.path and (self.col, self.row) == self.path[0]:
             self.path.pop(0)

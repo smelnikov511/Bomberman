@@ -9,18 +9,27 @@ from .entities import Entity
 
 class Player(Entity):
     
-    def __init__(self, col, row):
-        super().__init__(col, row, COLOURS['BLUE'])
+    def __init__(self, col, row, colour=COLOURS['BLUE'],
+                 up=pygame.K_UP, down=pygame.K_DOWN,
+                 left=pygame.K_LEFT, right=pygame.K_RIGHT,
+                 bomb_key=pygame.K_SPACE):
+        super().__init__(col, row, colour)
+        self.up_key = up
+        self.down_key = down
+        self.left_key = left
+        self.right_key = right
+        self.bomb_key = bomb_key
+        self.player_name = None
 
     def handle_input(self, keys):
         new_dir = Direction.NONE
-        if keys[pygame.K_UP]:
+        if keys[self.up_key]:
             new_dir = Direction.UP
-        elif keys[pygame.K_DOWN]:
+        elif keys[self.down_key]:
             new_dir = Direction.DOWN
-        elif keys[pygame.K_LEFT]:
+        elif keys[self.left_key]:
             new_dir = Direction.LEFT
-        elif keys[pygame.K_RIGHT]:
+        elif keys[self.right_key]:
             new_dir = Direction.RIGHT
         
         if new_dir != self.direction:

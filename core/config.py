@@ -37,6 +37,11 @@ class GameState(Enum):
     GAME_OVER = 2
     PAUSE = 3
 
+class PowerUpType(Enum):
+    SPEED = 0
+    FIRE = 1
+    BOMB = 2
+
 COLOURS = {
     'RED': (255, 0, 0),
     'GREEN': (0, 100, 0),

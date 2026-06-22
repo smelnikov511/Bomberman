@@ -14,14 +14,14 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 clock = pygame.time.Clock()
 
 def reset_game():
-    return Map(), Player(1, 1), [], []
+    return Map(), Player(1, 1), [], [], []
 
 def main():
 
     state = GameState.MENU
     menu = Menu()
     game_over = GameOver()
-    game_map = player = bombs = explosions = None
+    game_map = player = bombs = explosions = powerups = None
     running = True
 
     while running:
@@ -32,7 +32,7 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if state == GameState.MENU and event.key == pygame.K_SPACE:
                     state = GameState.PLAYING
-                    game_map, player, bombs, explosions = reset_game()
+                    game_map, player, bombs, explosions, powerups = reset_game()
                 elif state == GameState.MENU and event.key == pygame.K_ESCAPE:
                     running = False
                 elif state == GameState.PLAYING and event.key == pygame.K_ESCAPE:
@@ -43,7 +43,7 @@ def main():
                 elif state == GameState.GAME_OVER:
                     if event.key == pygame.K_SPACE:
                         state = GameState.PLAYING
-                        game_map, player, bombs, explosions = reset_game()
+                        game_map, player, bombs, explosions, powerups = reset_game()
                     elif event.key == pygame.K_ESCAPE:
                         state = GameState.MENU
                 
@@ -59,12 +59,12 @@ def main():
             if state == GameState.PLAYING:
                 keys = pygame.key.get_pressed()
                 player.handle_input(keys)
-                player.update(game_map, bombs)
+                player.update(game_map, bombs, powerups)
                 new_explosions = []
                 for bomb in bombs[:]:
                     if bomb.exploded:
                         continue
-                    result = bomb.update(game_map, [player], bombs)
+                    result = bomb.update(game_map, [player], bombs, powerups)
                     if result:
                         new_explosions.append(result)
                 explosions.extend(new_explosions)
@@ -80,6 +80,8 @@ def main():
                 bomb.render(screen)
             for explosion in explosions:
                 explosion.render(screen)
+            for pu in powerups:
+                pu.render(screen)
             player.render(screen)
 
             if state == GameState.PAUSE:

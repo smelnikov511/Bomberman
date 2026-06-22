@@ -27,11 +27,16 @@ class Player(Entity):
             self.direction = new_dir
             self._snap_to_grid()
         
-    def update(self, game_map, bombs):
+    # Обновление игрока: движение и сбор улучшений
+    def update(self, game_map, bombs, powerups):
         if not self.alive:
             return
         x, y = self.direction.value
         self.move(x, y, game_map, bombs)
+        for pu in powerups[:]:
+            if self.rect().colliderect(pu.rect()):
+                pu.apply(self)
+                powerups.remove(pu)
     
     def place_bomb(self):
         if self.active_bomb < self.max_bombs:

@@ -2,8 +2,9 @@
 
 import pygame
 
-from .config import TileType, BOMB_TIMER, COLOURS, POWERUP_DROP_CHANCE, TILE_SIZE
+from .config import TileType, BOMB_TIMER, COLOURS, TILE_SIZE
 from .explosion import Explosion
+from .powerup import PowerUp
 
 
 class Bomb():
@@ -19,15 +20,16 @@ class Bomb():
         self.pixel_y = row * TILE_SIZE
         self.owner_can_pass = True  # владелец может пройти через бомбу
     
-    def update(self, game_map, entities, bombs):
+    # Обновление состояния бомбы: уменьшаем таймер, если время вышло — взрываем
+    def update(self, game_map, entities, bombs, powerups):
         if self.exploded:
             return None
         self.timer -= 1
         if self.timer > 0:
             return None
-        return self.explode(game_map, entities, bombs)
+        return self.explode(game_map, entities, bombs, powerups)
 
-    def explode(self, game_map, entities, bombs):
+    def explode(self, game_map, entities, bombs, powerups):
         self.exploded = True
         self.owner.active_bomb -= 1
         segments = [(self.col, self.row)]
@@ -45,6 +47,9 @@ class Bomb():
                 if tile == TileType.SOFT_WALL:
                     segments.append((c, r))
                     game_map.destroy_soft_wall(c, r)
+                    pu = PowerUp.try_spawn(c, r)
+                    if pu:
+                        powerups.append(pu)
                     break
                 # if tile == EMPTY
                 segments.append((c, r))
@@ -53,7 +58,7 @@ class Bomb():
             if bomb is self or bomb.exploded:
                 continue
             if (bomb.col, bomb.row) in segments:
-                bomb.explode(game_map, entities, bombs)
+                bomb.explode(game_map, entities, bombs, powerups)
 
         for entity in entities:
             if not entity.alive:

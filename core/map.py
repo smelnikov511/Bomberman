@@ -19,23 +19,23 @@ class Map():
         self.generate_layout()
 
     def generate_layout(self):
-        for x in range(self.rows):
-            for y in range(self.cols):
-                if x == 0 or x == self.rows - 1 or y == 0 or y == self.cols - 1:
-                    self.grid[x][y] = TileType.HARD_WALL
-                elif x % 2 == 0  and y % 2 == 0:
-                    self.grid[x][y] = TileType.HARD_WALL
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if row == 0 or row == self.rows - 1 or col == 0 or col == self.cols - 1:
+                    self.grid[row][col] = TileType.HARD_WALL
+                elif row % 2 == 0 and col % 2 == 0:
+                    self.grid[row][col] = TileType.HARD_WALL
 
         box_density = 0.5
-        for x in range(1, self.rows - 1):
-            for y in range(1, self.cols - 1):
+        for row in range(1, self.rows - 1):
+            for col in range(1, self.cols - 1):
                 if (
-                    self.grid[x][y] == TileType.EMPTY
+                    self.grid[row][col] == TileType.EMPTY
                     and
-                    (x, y) != (1, 1) and (x, y) != (13, 15)
+                    (row, col) != (1, 1) and (row, col) != (13, 15)
                 ):
                     if random.random() < box_density:
-                        self.grid[x][y] = TileType.SOFT_WALL
+                        self.grid[row][col] = TileType.SOFT_WALL
 
     def destroy_soft_wall(self, col, row):
         if self.grid[row][col] == TileType.SOFT_WALL:

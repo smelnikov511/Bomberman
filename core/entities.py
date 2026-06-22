@@ -36,9 +36,13 @@ class Entity():
             TILE_SIZE - self.margin * 2,
         )  # Это то, куда персонаж хочет пройти
 
-        # Коллизия со стенами
-        for row in range(game_map.rows):
-            for col in range(game_map.cols):
+        # Коллизия со стенами — проверяем только тайлы вокруг проверяемой позиции
+        min_col = max(0, int(x // TILE_SIZE) - 1)
+        max_col = min(game_map.cols - 1, int((x + TILE_SIZE) // TILE_SIZE) + 1)
+        min_row = max(0, int(y // TILE_SIZE) - 1)
+        max_row = min(game_map.rows - 1, int((y + TILE_SIZE) // TILE_SIZE) + 1)
+        for row in range(min_row, max_row + 1):
+            for col in range(min_col, max_col + 1):
                 if game_map.grid[row][col] != TileType.EMPTY:
                     wall_rect = pygame.Rect(
                         col * TILE_SIZE,

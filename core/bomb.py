@@ -58,10 +58,11 @@ class Bomb():
         for entity in entities:
             if not entity.alive:
                 continue
-            cx = round(entity.pixel_x / TILE_SIZE)
-            cy = round(entity.pixel_y / TILE_SIZE)
-            if (cx, cy) in segments:
-                entity.die()
+            for c, r in segments:
+                seg_rect = pygame.Rect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                if seg_rect.colliderect(entity.rect()):
+                    entity.die()
+                    break
         return Explosion(segments)
     
     def render(self, screen):

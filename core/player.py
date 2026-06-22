@@ -2,6 +2,7 @@
 
 import pygame
 
+from .bomb import Bomb
 from .config import Direction, TILE_SIZE, COLOURS, SPEED_BOOST, FIRE_BOOST
 from .entities import Entity
 
@@ -10,7 +11,6 @@ class Player(Entity):
     
     def __init__(self, col, row):
         super().__init__(col, row, COLOURS['BLUE'])
-        self.bomb_count = 0  # Сколько бомб сейчас на карте
 
     def handle_input(self, keys):
         new_dir = Direction.NONE
@@ -32,4 +32,10 @@ class Player(Entity):
             return
         x, y = self.direction.value
         self.move(x, y, game_map, bombs)
+    
+    def place_bomb(self):
+        if self.active_bomb < self.max_bombs:
+            self.active_bomb += 1
+            return Bomb(self.row, self.col, self.bomb_range, self)
+        return None
     

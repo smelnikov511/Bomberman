@@ -26,13 +26,13 @@ class Map():
                 elif x % 2 == 0  and y % 2 == 0:
                     self.grid[x][y] = TileType.HARD_WALL
 
-        box_density = 0.65
+        box_density = 0.5
         for x in range(1, self.rows - 1):
             for y in range(1, self.cols - 1):
                 if (
                     self.grid[x][y] == TileType.EMPTY
                     and
-                    (x, y) != (1, 1) and (x, y) != (15, 13)
+                    (x, y) != (1, 1) and (x, y) != (13, 15)
                 ):
                     if random.random() < box_density:
                         self.grid[x][y] = TileType.SOFT_WALL
@@ -43,6 +43,9 @@ class Map():
             return True
         return False
     
+    def is_within_bounds(self, col, row):
+        return 0 <= col < self.cols and 0 <= row < self.rows
+
     def render(self, screen):
         for row in range(self.rows):
             for col in range(self.cols):

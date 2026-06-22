@@ -15,7 +15,7 @@ class Entity():
         self.direction = Direction.NONE
         self.speed = PLAYER_SPEED
         self.bomb_range = DEFAULT_BOMB_RANGE
-        self.max_bomb = DEFAULT_MAX_BOMB
+        self.max_bombs = DEFAULT_MAX_BOMB
         self.active_bomb = 0
         self.alive = True
         self.colour = colour
@@ -50,8 +50,20 @@ class Entity():
                     if test_rect.colliderect(wall_rect):
                         return True
             
-            # Коллизия с бомбами
+        # Коллизия с бомбами
         for bomb in obstacles:
+            bomb_rect = pygame.Rect(
+                bomb.col * TILE_SIZE,
+                bomb.row * TILE_SIZE,
+                TILE_SIZE,
+                TILE_SIZE
+            )
+            if bomb.owner is self and bomb.owner_can_pass:
+                if not test_rect.colliderect(bomb_rect):
+                    bomb.owner_can_pass = False
+                continue
+            if test_rect.colliderect(bomb_rect):
+                return True
             bomb_rect = pygame.Rect(
                 bomb.col * TILE_SIZE,
                 bomb.row * TILE_SIZE,

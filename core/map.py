@@ -32,6 +32,8 @@ class Map():
                 if (self.grid[row][col] == TileType.EMPTY
                     and not (1 <= row <= 2 and 1 <= col <= 2)
                     and not (11 <= row <= 13 and 13 <= col <= 15)
+                    and not (11 <= row <= 13 and 1 <= col <= 2)
+                    and not (1 <= row <= 2 and 13 <= col <= 15)
                 ):
                     if random.random() < box_density:
                         self.grid[row][col] = TileType.SOFT_WALL

@@ -109,4 +109,5 @@ class Entity():
         self.alive = False
     
     def render(self, screen):
-        pygame.draw.rect(screen, self.colour, self.rect())
+        colour = self.colour if self.alive else (0, 0, 0)
+        pygame.draw.rect(screen, colour, self.rect())

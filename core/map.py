@@ -26,13 +26,12 @@ class Map():
                 elif row % 2 == 0 and col % 2 == 0:
                     self.grid[row][col] = TileType.HARD_WALL
 
-        box_density = 0.5
+        box_density = 0.75
         for row in range(1, self.rows - 1):
             for col in range(1, self.cols - 1):
-                if (
-                    self.grid[row][col] == TileType.EMPTY
-                    and
-                    (row, col) != (1, 1) and (row, col) != (13, 15)
+                if (self.grid[row][col] == TileType.EMPTY
+                    and not (1 <= row <= 2 and 1 <= col <= 2)
+                    and not (12 <= row <= 13 and 14 <= col <= 15)
                 ):
                     if random.random() < box_density:
                         self.grid[row][col] = TileType.SOFT_WALL

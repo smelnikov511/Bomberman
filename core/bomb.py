@@ -29,6 +29,7 @@ class Bomb():
             return None
         return self.explode(game_map, entities, bombs, powerups)
 
+    # Распространение огня
     def explode(self, game_map, entities, bombs, powerups):
         self.exploded = True
         self.owner.active_bomb -= 1
@@ -51,6 +52,10 @@ class Bomb():
                     pu = PowerUp.try_spawn(c, r)
                     if pu:
                         powerups.append(pu)
+                    break
+                # Взрыв останавливается на тайле с powerup
+                if any(pu.col == c and pu.row == r for pu in powerups):
+                    segments.append((c, r))
                     break
                 # if tile == EMPTY
                 segments.append((c, r))

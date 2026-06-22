@@ -33,6 +33,7 @@ class Bomb():
         self.exploded = True
         self.owner.active_bomb -= 1
         segments = [(self.col, self.row)]
+        existing_powerups = list(powerups)  # копия старых powerup'ов до спавна новых
 
         direction = [(0, -1), (0, 1), (-1, 0), (1, 0)]
         for x, y in direction:
@@ -58,7 +59,9 @@ class Bomb():
             if bomb is self or bomb.exploded:
                 continue
             if (bomb.col, bomb.row) in segments:
-                bomb.explode(game_map, entities, bombs, powerups)
+                chained = bomb.explode(game_map, entities, bombs, powerups)
+                if chained:
+                    segments.extend(chained.segments)
 
         for entity in entities:
             if not entity.alive:
@@ -68,6 +71,14 @@ class Bomb():
                 if seg_rect.colliderect(entity.rect()):
                     entity.die()
                     break
+
+        for pu in existing_powerups:
+            for c, r in segments:
+                seg_rect = pygame.Rect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                if seg_rect.colliderect(pu.rect()):
+                    powerups.remove(pu)
+                    break
+
         return Explosion(segments)
     
     def render(self, screen):

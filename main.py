@@ -2,11 +2,13 @@ import pygame
 
 from core.bomb import Bomb
 from core.config import *
+from core.enemy import Enemy
 from core.explosion import Explosion
 from core.game_over import GameOver
 from core.map import Map
 from core.menu import Menu
 from core.player import Player
+from core.win import Win
 
 
 pygame.init()
@@ -14,14 +16,15 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 clock = pygame.time.Clock()
 
 def reset_game():
-    return Map(), Player(1, 1), [], [], []
+    return Map(), Player(1, 1), [], [], [], Enemy(15, 13)
 
 def main():
 
     state = GameState.MENU
     menu = Menu()
     game_over = GameOver()
-    game_map = player = bombs = explosions = powerups = None
+    win_screen = Win()
+    game_map = player = bombs = explosions = powerups = enemy = None
     running = True
 
     while running:
@@ -32,7 +35,7 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if state == GameState.MENU and event.key == pygame.K_SPACE:
                     state = GameState.PLAYING
-                    game_map, player, bombs, explosions, powerups = reset_game()
+                    game_map, player, bombs, explosions, powerups, enemy = reset_game()
                 elif state == GameState.MENU and event.key == pygame.K_ESCAPE:
                     running = False
                 elif state == GameState.PLAYING and event.key == pygame.K_ESCAPE:
@@ -40,10 +43,10 @@ def main():
                 elif state == GameState.PAUSE and event.key == pygame.K_ESCAPE:
                     state = GameState.PLAYING
 
-                elif state == GameState.GAME_OVER:
+                elif state in (GameState.GAME_OVER, GameState.WIN):
                     if event.key == pygame.K_SPACE:
                         state = GameState.PLAYING
-                        game_map, player, bombs, explosions, powerups = reset_game()
+                        game_map, player, bombs, explosions, powerups, enemy = reset_game()
                     elif event.key == pygame.K_ESCAPE:
                         state = GameState.MENU
                 
@@ -60,11 +63,15 @@ def main():
                 keys = pygame.key.get_pressed()
                 player.handle_input(keys)
                 player.update(game_map, bombs, powerups)
+                enemy_bomb = enemy.update(game_map, bombs, player, powerups)
+                if enemy_bomb:
+                    bombs.append(enemy_bomb)
                 new_explosions = []
+                entities = [player, enemy]
                 for bomb in bombs[:]:
                     if bomb.exploded:
                         continue
-                    result = bomb.update(game_map, [player], bombs, powerups)
+                    result = bomb.update(game_map, entities, bombs, powerups)
                     if result:
                         new_explosions.append(result)
                 explosions.extend(new_explosions)
@@ -73,6 +80,8 @@ def main():
 
                 if not player.alive:
                     state = GameState.GAME_OVER
+                elif not enemy.alive:
+                    state = GameState.WIN
 
             screen.fill(COLOURS['GREEN'])
             game_map.render(screen)
@@ -83,6 +92,7 @@ def main():
             for pu in powerups:
                 pu.render(screen)
             player.render(screen)
+            enemy.render(screen)
 
             if state == GameState.PAUSE:
                 s = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -96,6 +106,8 @@ def main():
 
         elif state == GameState.GAME_OVER:
             game_over.render(screen)
+        elif state == GameState.WIN:
+            win_screen.render(screen)
 
         pygame.display.flip()
         clock.tick(FPS)

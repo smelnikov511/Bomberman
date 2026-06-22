@@ -9,6 +9,7 @@ WINDOW_HEIGHT = 960
 FPS = 60
 
 PLAYER_SPEED = 3
+ENEMY_SPEED = 3
 SPEED_BOOST = 1
 DEFAULT_BOMB_RANGE = 2
 FIRE_BOOST = 1
@@ -36,6 +37,7 @@ class GameState(Enum):
     PLAYING = 1
     GAME_OVER = 2
     PAUSE = 3
+    WIN = 4
 
 class PowerUpType(Enum):
     SPEED = 0

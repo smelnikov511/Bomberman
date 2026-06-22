@@ -4,8 +4,7 @@ import pygame
 from .config import TILE_SIZE, COLS, ROWS, WINDOW_HEIGHT, WINDOW_WIDTH, TileType
 from .blocks import render_tile
 
-pygame.init()
-screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
 tile_size = TILE_SIZE
 
 class Map():

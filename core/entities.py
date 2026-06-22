@@ -3,6 +3,7 @@
 import pygame
 
 from .config import Direction, TileType, TILE_SIZE, PLAYER_SPEED, DEFAULT_BOMB_RANGE, DEFAULT_MAX_BOMB
+from .map import Map
 
 class Entity():
 
@@ -37,8 +38,8 @@ class Entity():
         )  # Это то, куда персонаж хочет пройти
 
         # Коллизия со стенами
-        for row in range(self.row):
-            for col in range(self.col):
+        for row in range(game_map.rows):
+            for col in range(game_map.cols):
                 if game_map.grid[row][col] != TileType.EMPTY:
                     wall_rect = pygame.Rect(
                         col * TILE_SIZE,
@@ -50,23 +51,23 @@ class Entity():
                         return True
             
             # Коллизия с бомбами
-            for bomb in obstacles:
-                bomb_rect = pygame.Rect(
-                    col * TILE_SIZE,
-                    row * TILE_SIZE,
-                    TILE_SIZE,
-                    TILE_SIZE
-                )
-                if test_rect.colliderect(bomb_rect):
-                    return True
-            
-            # Границы карты
-            if (x < 0 or x + TILE_SIZE > game_map.cols * TILE_SIZE
-                or 
-                y < 0 or y + TILE_SIZE > game_map.rows * TILE_SIZE):
+        for bomb in obstacles:
+            bomb_rect = pygame.Rect(
+                bomb.col * TILE_SIZE,
+                bomb.row * TILE_SIZE,
+                TILE_SIZE,
+                TILE_SIZE
+            )
+            if test_rect.colliderect(bomb_rect):
                 return True
             
-            return False
+        # Границы карты
+        if (x < 0 or x + TILE_SIZE > game_map.cols * TILE_SIZE
+            or 
+            y < 0 or y + TILE_SIZE > game_map.rows * TILE_SIZE):
+            return True
+            
+        return False
 
 
     def move(self, x, y, game_map, obstacles):
@@ -81,8 +82,14 @@ class Entity():
             self.pixel_x = new_x
         elif not self._collides_with(self.pixel_x, new_y, game_map, obstacles):
             self.pixel_y = new_y
-        self.col = self.pixel_x // TILE_SIZE
-        self.row = self.pixel_y // TILE_SIZE
+        self.col = round(self.pixel_x / TILE_SIZE)
+        self.row = round(self.pixel_y / TILE_SIZE)
+    
+    def _snap_to_grid(self):
+        if self.direction in (Direction.UP, Direction.DOWN):
+            self.pixel_x = self.col * TILE_SIZE
+        elif self.direction in (Direction.LEFT, Direction.RIGHT):
+            self.pixel_y = self.row * TILE_SIZE
 
     def die(self):
         self.alive = False

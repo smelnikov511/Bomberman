@@ -35,6 +35,11 @@ class Entity():
             TILE_SIZE - self.margin * 2,
             TILE_SIZE - self.margin * 2,
         )  # Это то, куда персонаж хочет пройти
+        current_rect = pygame.Rect(
+            self.pixel_x + self.margin, self.pixel_y + self.margin,
+            TILE_SIZE - self.margin * 2,
+            TILE_SIZE - self.margin * 2,
+        )  # Текущая позиция (для проверки "стою на бомбе")
 
         # Коллизия со стенами — проверяем только тайлы вокруг проверяемой позиции
         min_col = max(0, int(x // TILE_SIZE) - 1)
@@ -64,6 +69,8 @@ class Entity():
             if bomb.owner is self and bomb.owner_can_pass:
                 if not test_rect.colliderect(bomb_rect):
                     bomb.owner_can_pass = False
+                continue
+            if current_rect.colliderect(bomb_rect):
                 continue
             if test_rect.colliderect(bomb_rect):
                 return True

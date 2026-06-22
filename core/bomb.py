@@ -80,7 +80,7 @@ class Bomb():
         for pu in existing_powerups:
             for c, r in segments:
                 seg_rect = pygame.Rect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                if seg_rect.colliderect(pu.rect()):
+                if seg_rect.colliderect(pu.rect()) and pu in powerups:
                     powerups.remove(pu)
                     break
 

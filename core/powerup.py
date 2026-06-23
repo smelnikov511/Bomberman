@@ -1,9 +1,8 @@
-"""PowerUp: SpeedUp, FireUp и BombUp, выпадают из разрушенных SOFT_WALL"""
-
 import random
 import pygame
 
 from .config import TILE_SIZE, COLOURS, POWERUP_DROP_CHANCE, SPEED_BOOST, FIRE_BOOST, BOMB_BOOST, PowerUpType
+from .sprites import Sprites
 
 
 POWERUP_COLOURS = {
@@ -41,7 +40,12 @@ class PowerUp:
         return pygame.Rect(self.pixel_x, self.pixel_y, TILE_SIZE, TILE_SIZE)
 
     def render(self, screen):
-        colour = POWERUP_COLOURS[self.ptype]
-        rect = self.rect()
-        pygame.draw.rect(screen, colour, rect)
-        pygame.draw.rect(screen, COLOURS['WHITE'], rect.inflate(-24, -24))
+        Sprites.ensure()
+        spr = Sprites.powerup[self.ptype]
+        if spr:
+            screen.blit(spr, (self.pixel_x, self.pixel_y))
+        else:
+            colour = POWERUP_COLOURS[self.ptype]
+            rect = self.rect()
+            pygame.draw.rect(screen, colour, rect)
+            pygame.draw.rect(screen, COLOURS['WHITE'], rect.inflate(-24, -24))

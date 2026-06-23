@@ -36,12 +36,14 @@ class Player(Entity):
             self.direction = new_dir
             self._snap_to_grid()
         
-    # Обновление игрока: движение и сбор улучшений
     def update(self, game_map, bombs, powerups):
         if not self.alive:
             return
         x, y = self.direction.value
+        old_x, old_y = self.pixel_x, self.pixel_y
         self.move(x, y, game_map, bombs)
+        moved = (self.pixel_x != old_x or self.pixel_y != old_y)
+        self._update_animation(moved)
         for pu in powerups[:]:
             if self.rect().colliderect(pu.rect()):
                 pu.apply(self)

@@ -1,11 +1,21 @@
 import pygame
 
 from .config import TileType, COLOURS
+from .sprites import Sprites
 
 
 def render_tile(screen, tile_type, x, y, tile_size):
-    rect = (x, y, tile_size, tile_size)
+    Sprites.ensure()
     if tile_type == TileType.HARD_WALL:
-        pygame.draw.rect(screen, COLOURS['GREY'], pygame.Rect(rect))
+        spr = Sprites.hard_wall
     elif tile_type == TileType.SOFT_WALL:
-        pygame.draw.rect(screen, COLOURS['BROWN'], pygame.Rect(rect))
+        spr = Sprites.soft_wall
+    elif tile_type == TileType.EMPTY:
+        spr = Sprites.empty_wall
+    else:
+        return
+    if spr:
+        screen.blit(spr, (x, y))
+    elif tile_type != TileType.EMPTY:
+        colour = COLOURS['GREY'] if tile_type == TileType.HARD_WALL else COLOURS['BROWN']
+        pygame.draw.rect(screen, colour, (x, y, tile_size, tile_size))

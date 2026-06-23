@@ -51,9 +51,8 @@ class Map():
         for row in range(self.rows):
             for col in range(self.cols):
                 tile = self.grid[row][col]
-                if tile != TileType.EMPTY:
-                    px = col * tile_size
-                    py = row * tile_size
-                    render_tile(screen, tile, px, py, tile_size)
+                px = col * tile_size
+                py = row * tile_size
+                render_tile(screen, tile, px, py, tile_size)
 
 

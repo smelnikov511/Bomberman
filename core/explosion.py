@@ -1,23 +1,25 @@
-"""Explosion: распространение по 4 направлениям, уничтожение блоков, цепная реакция"""
-
 import pygame
 from .config import COLOURS, EXPLOSION_DURATION, TILE_SIZE
+from .sprites import Sprites
+
 
 class Explosion():
 
     def __init__(self, segments):
         self.segments = segments
         self.timer = EXPLOSION_DURATION
-    
+
     def update(self):
         self.timer -= 1
-        return self.timer <= 0  # True -> взрыв закончился, надо удалить
-    
+        return self.timer <= 0
+
     def render(self, screen):
+        Sprites.ensure()
         for col, row in self.segments:
             x = col * TILE_SIZE
             y = row * TILE_SIZE
-            # Внешний слой — оранжевый
-            pygame.draw.rect(screen, COLOURS['ORANGE'], (x, y, TILE_SIZE, TILE_SIZE))
-            # Внутренний слой — белый/жёлтый
-            pygame.draw.rect(screen, COLOURS['YELLOW'], (x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8))
+            if Sprites.explosion:
+                screen.blit(Sprites.explosion, (x, y))
+            else:
+                pygame.draw.rect(screen, COLOURS['ORANGE'], (x, y, TILE_SIZE, TILE_SIZE))
+                pygame.draw.rect(screen, COLOURS['YELLOW'], (x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8))

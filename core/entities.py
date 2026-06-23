@@ -2,7 +2,16 @@
 
 import pygame
 
-from .config import Direction, TileType, TILE_SIZE, PLAYER_SPEED, DEFAULT_BOMB_RANGE, DEFAULT_MAX_BOMB
+from .config import Direction, TileType, TILE_SIZE, PLAYER_SPEED, DEFAULT_BOMB_RANGE, DEFAULT_MAX_BOMB, ANIM_SPEED
+from .sprites import Sprites
+
+DIR_TO_INDEX = {
+    Direction.DOWN: 0,
+    Direction.LEFT: 1,
+    Direction.RIGHT: 2,
+    Direction.UP: 3,
+}
+
 
 class Entity():
 
@@ -20,6 +29,9 @@ class Entity():
         self.death_timer = 0
         self.colour = colour
         self.margin = 4
+        self.sprite_index = 0
+        self.anim_frame = 0
+        self.anim_timer = 0
 
     def rect(self):
         """Возвращает хитбокс (pygame.Rect) с учётом отступа."""
@@ -106,6 +118,31 @@ class Entity():
         elif self.direction in (Direction.LEFT, Direction.RIGHT):
             self.pixel_y = self.row * TILE_SIZE
 
+    def _update_animation(self, moved):
+        if moved:
+            if self.anim_frame == 0:
+                self.anim_frame = 1
+                self.anim_timer = 0
+            else:
+                self.anim_timer += 1
+                if self.anim_timer >= ANIM_SPEED:
+                    self.anim_timer = 0
+                    self.anim_frame = 3 - self.anim_frame
+        else:
+            self.anim_frame = 0
+            self.anim_timer = 0
+
+    def get_current_sprite(self):
+        dir_idx = DIR_TO_INDEX.get(self.direction, 0)
+        walk_frames = Sprites.player_walk[self.sprite_index][dir_idx]
+        stand = Sprites.player_stand[self.sprite_index]
+        if self.anim_frame == 0:
+            return stand
+        elif self.anim_frame == 1:
+            return walk_frames[0] or stand
+        else:
+            return walk_frames[1] or stand
+
     def die(self):
         self.alive = False
         self.death_timer = 120
@@ -113,5 +150,14 @@ class Entity():
     def render(self, screen):
         if not self.alive and self.death_timer <= 0:
             return
-        colour = self.colour if self.alive else (0, 0, 0)
-        pygame.draw.rect(screen, colour, self.rect())
+        if not self.alive:
+            dead = Sprites.player_dead
+            if dead:
+                screen.blit(dead, (self.pixel_x, self.pixel_y))
+                return
+        sprite = self.get_current_sprite()
+        if sprite and self.alive:
+            screen.blit(sprite, (self.pixel_x, self.pixel_y))
+        else:
+            colour = self.colour if self.alive else (0, 0, 0)
+            pygame.draw.rect(screen, colour, self.rect())

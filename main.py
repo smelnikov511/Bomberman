@@ -8,15 +8,22 @@ from core.game_over import GameOver
 from core.map import Map
 from core.menu import Menu
 from core.player import Player
+from core.sprites import Sprites
 from core.win import Win
 
 
 pygame.init()
-screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+display_info = pygame.display.Info()
+scale = min(display_info.current_w / WINDOW_WIDTH,
+            display_info.current_h / WINDOW_HEIGHT)
+win_w = int(WINDOW_WIDTH * scale)
+win_h = int(WINDOW_HEIGHT * scale)
+screen = pygame.display.set_mode((win_w, win_h), pygame.RESIZABLE)
+render_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
 clock = pygame.time.Clock()
 
 SPAWNS = [(1, 1), (15, 13), (1, 11), (13, 1)]
-PLAYER_COLOURS = [COLOURS['BLUE'], COLOURS['PINK'], COLOURS['YELLOW'], COLOURS['PURPLE']]
+PLAYER_COLOURS = [COLOURS['BLUE'], COLOURS['ORANGE'], COLOURS['RED'], COLOURS['PINK']]
 PLAYER_KEYS = [
     (pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d, pygame.K_g),
     (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_SPACE),
@@ -26,6 +33,7 @@ PLAYER_KEYS = [
 
 
 def reset_game(config):
+    Sprites.ensure()
     players = []
     enemies = []
     for i, choice in enumerate(config):
@@ -33,17 +41,21 @@ def reset_game(config):
             continue
         col, row = SPAWNS[i]
         if choice == 'ai':
-            enemies.append(Enemy(col, row))
+            e = Enemy(col, row)
+            e.sprite_index = i
+            enemies.append(e)
         elif choice == 'player':
             colour = PLAYER_COLOURS[i]
             up, down, left, right, bomb = PLAYER_KEYS[i]
             p = Player(col, row, colour, up, down, left, right, bomb)
+            p.sprite_index = i
             p.player_name = f"Player {i + 1}"
             players.append(p)
     return Map(), players, enemies, [], [], []
 
 
 def main():
+    global screen
 
     state = GameState.MENU
     menu = Menu()
@@ -58,6 +70,8 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.VIDEORESIZE:
+                screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
 
             if event.type == pygame.KEYDOWN:
                 if state == GameState.MENU:
@@ -90,7 +104,7 @@ def main():
                                 bombs.append(bomb)
 
         if state == GameState.MENU:
-            menu.render(screen)
+            menu.render(render_surface)
 
         elif state in (GameState.PLAYING, GameState.PAUSE):
             if state == GameState.PLAYING:
@@ -135,34 +149,41 @@ def main():
                     if len(alive) <= 1:
                         death_timer = DEATH_DELAY
 
-            screen.fill(COLOURS['GREEN'])
-            game_map.render(screen)
+            render_surface.fill(COLOURS['GREEN'])
+            game_map.render(render_surface)
             for bomb in bombs:
-                bomb.render(screen)
+                bomb.render(render_surface)
             for explosion in explosions:
-                explosion.render(screen)
+                explosion.render(render_surface)
             for pu in powerups:
-                pu.render(screen)
+                pu.render(render_surface)
             for p in players:
-                p.render(screen)
+                p.render(render_surface)
             for e in enemies:
-                e.render(screen)
+                e.render(render_surface)
 
             if state == GameState.PAUSE:
                 s = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
                 s.set_alpha(128)
                 s.fill((0, 0, 0))
-                screen.blit(s, (0, 0))
+                render_surface.blit(s, (0, 0))
                 font = pygame.font.Font(None, 72)
                 text = font.render("PAUSED", True, COLOURS['WHITE'])
                 text_rect = text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
-                screen.blit(text, text_rect)
+                render_surface.blit(text, text_rect)
 
         elif state == GameState.GAME_OVER:
-            game_over.render(screen)
+            game_over.render(render_surface)
         elif state == GameState.WIN:
-            win_screen.render(screen, winner_text)
+            win_screen.render(render_surface, winner_text)
 
+        screen.fill((0, 0, 0))
+        sw, sh = screen.get_size()
+        scale = min(sw / WINDOW_WIDTH, sh / WINDOW_HEIGHT)
+        scaled_w = int(WINDOW_WIDTH * scale)
+        scaled_h = int(WINDOW_HEIGHT * scale)
+        screen.blit(pygame.transform.scale(render_surface, (scaled_w, scaled_h)),
+                    ((sw - scaled_w) // 2, (sh - scaled_h) // 2))
         pygame.display.flip()
         clock.tick(FPS)
     

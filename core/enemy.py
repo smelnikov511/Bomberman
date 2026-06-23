@@ -251,8 +251,10 @@ class Enemy(Entity):
         x, y = self.direction.value
         old_x, old_y = self.pixel_x, self.pixel_y
         self.move(x, y, game_map, bombs)
+        moved = (self.pixel_x != old_x or self.pixel_y != old_y)
+        self._update_animation(moved)
 
-        if self.pixel_x == old_x and self.pixel_y == old_y:
+        if not moved:
             self._on_stuck(game_map, bombs)
 
         if self.state == EnemyState.PLACE_BOMB:

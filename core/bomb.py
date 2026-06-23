@@ -5,6 +5,7 @@ import pygame
 from .config import TileType, BOMB_TIMER, COLOURS, TILE_SIZE
 from .explosion import Explosion
 from .powerup import PowerUp
+from .sprites import Sprites
 
 
 class Bomb():
@@ -87,5 +88,9 @@ class Bomb():
         return Explosion(segments)
     
     def render(self, screen):
-        pygame.draw.rect(screen, COLOURS['BLACK'], (self.pixel_x, self.pixel_y, TILE_SIZE, TILE_SIZE))
-        pygame.draw.rect(screen, COLOURS['WHITE'], (self.pixel_x + 2, self.pixel_y + 2, TILE_SIZE - 4, TILE_SIZE - 4))
+        Sprites.ensure()
+        if Sprites.bomb:
+            screen.blit(Sprites.bomb, (self.pixel_x, self.pixel_y))
+        else:
+            pygame.draw.rect(screen, COLOURS['BLACK'], (self.pixel_x, self.pixel_y, TILE_SIZE, TILE_SIZE))
+            pygame.draw.rect(screen, COLOURS['WHITE'], (self.pixel_x + 2, self.pixel_y + 2, TILE_SIZE - 4, TILE_SIZE - 4))

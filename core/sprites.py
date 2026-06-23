@@ -12,6 +12,7 @@ class Sprites:
     DIRS = ['down', 'left', 'right', 'up']
 
     @classmethod
+    # O(P) — P = количество спрайтов (~30), выполняется один раз
     def ensure(cls):
         if cls._loaded:
             return
@@ -40,6 +41,7 @@ class Sprites:
         cls._loaded = True
 
     @classmethod
+    # O(1) — загрузка одного изображения
     def _load(cls, path, size=None):
         full = os.path.join(SPRITE_DIR, path)
         if os.path.exists(full):

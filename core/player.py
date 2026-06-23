@@ -9,6 +9,7 @@ from .entities import Entity
 
 class Player(Entity):
     
+    # O(1)
     def __init__(self, col, row, colour=COLOURS['BLUE'],
                  up=pygame.K_UP, down=pygame.K_DOWN,
                  left=pygame.K_LEFT, right=pygame.K_RIGHT,
@@ -21,6 +22,7 @@ class Player(Entity):
         self.bomb_key = bomb_key
         self.player_name = None
 
+    # O(1)
     def handle_input(self, keys):
         new_dir = Direction.NONE
         if keys[self.up_key]:
@@ -36,6 +38,7 @@ class Player(Entity):
             self.direction = new_dir
             self._snap_to_grid()
         
+    # O(B + P) — B = бомбы, P = пауэрапы
     def update(self, game_map, bombs, powerups):
         if not self.alive:
             return
@@ -49,6 +52,7 @@ class Player(Entity):
                 pu.apply(self)
                 powerups.remove(pu)
     
+    # O(1)
     def place_bomb(self):
         if self.active_bomb < self.max_bombs:
             self.active_bomb += 1

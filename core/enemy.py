@@ -20,6 +20,7 @@ class EnemyState(Enum):
 
 class Enemy(Entity):
 
+    # O(1)
     def __init__(self, col, row):
         super().__init__(col, row, COLOURS['RED'])
         self.speed = ENEMY_SPEED
@@ -28,6 +29,7 @@ class Enemy(Entity):
         self.path = []
         self.wander_timer = random.randint(30, 90)
 
+    # O(P + Pl + E) — P = пауэрапы, Pl = игроки, E = враги
     def _choose_target(self, game_map, players, enemies, powerups):
         best_target = None
         best_dist = float('inf')
@@ -54,13 +56,16 @@ class Enemy(Entity):
             return best_target
         return None
 
+    # O(1)
     def _wall_nearby(self, game_map):
         for dx, dy in ((0, -1), (0, 1), (-1, 0), (1, 0)):
             c, r = self.col + dx, self.row + dy
             if game_map.is_within_bounds(c, r) and game_map.grid[r][c] == TileType.SOFT_WALL:
                 return True
         return False
-
+    
+    # BFS: обход от текущей клетки, первая найденная клетка вне радиуса всех бомб
+    # O(N) — N ≤ 144 (BFS с max_dist=12)
     def _find_nearest_safe_tile(self, game_map, bombs, max_dist=12):
         visited = {(self.col, self.row)}
         queue = deque([(self.col, self.row)])
@@ -84,6 +89,7 @@ class Enemy(Entity):
                 queue.append((nc, nr))
         return None
 
+    # O(N + Pl + E) — N = BFS, Pl = игроки, E = враги
     def _should_place_bomb(self, game_map, players, enemies, bombs):
         if self.active_bomb >= self.max_bombs:
             return False
@@ -105,12 +111,14 @@ class Enemy(Entity):
                 return True
         return False
 
+    # O(1)
     def _place_bomb(self):
         if self.active_bomb < self.max_bombs:
             self.active_bomb += 1
             return Bomb(self.row, self.col, self.bomb_range, self)
         return None
 
+    # O(B * R) — B = бомбы, R = радиус
     def _is_safe_tile(self, col, row, game_map, bombs):
         for bomb in bombs:
             if bomb.exploded:
@@ -132,10 +140,12 @@ class Enemy(Entity):
                         break
         return True
 
+    # O(1)
     def _snap_to_cell(self):
         self.pixel_x = self.col * TILE_SIZE
         self.pixel_y = self.row * TILE_SIZE
 
+    # O(L) — L = длина пути
     def _follow_path(self):
         while self.path and (self.col, self.row) == self.path[0]:
             self.path.pop(0)
@@ -154,6 +164,7 @@ class Enemy(Entity):
             self.direction = Direction.UP
         self._snap_to_grid()
 
+    # O(A* + N + P + Pl + E) — A*, BFS, сканирование
     def _update_state(self, game_map, bombs, players, enemies, powerups):
         unsafe = not self._is_safe_tile(self.col, self.row, game_map, bombs)
 
@@ -194,6 +205,7 @@ class Enemy(Entity):
             if self.state == EnemyState.IDLE:
                 self.state = EnemyState.WANDER
 
+    # O(A* + N) — A* pathfinding + BFS
     def _execute_state(self, game_map, bombs, players, enemies, powerups):
         if self.state == EnemyState.FLEE:
             if not self.path:
@@ -224,6 +236,7 @@ class Enemy(Entity):
         elif self.state == EnemyState.IDLE:
             self.direction = Direction.NONE
 
+    # O(1)
     def _on_stuck(self, game_map, bombs):
         if self.state == EnemyState.WANDER:
             self.direction = random.choice([Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT])
@@ -231,6 +244,7 @@ class Enemy(Entity):
             return
         self.path.clear()
 
+    # O(P + A* + B + N) — P = пауэрапы, A*, B = бомбы, N = BFS
     def update(self, game_map, bombs, players, enemies, powerups):
         if not self.alive:
             return None

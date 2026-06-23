@@ -4,10 +4,13 @@ import heapq
 
 from .config import TileType
 
-
+# Алгоритм поиска кратчайшего пути
 class AStar:
 
     @staticmethod
+    # A*: поиск кратчайшего пути от start до goal по EMPTY-тайлам без бомб,
+    # манхэттенская эвристика + приоритетная очередь (heapq)
+    # O(V log V) — V = количество клеток (≤ 256)
     def find_path(start, goal, game_map, bombs, max_cells=256):
         if start == goal:
             return [start]
@@ -34,10 +37,13 @@ class AStar:
         return None
 
     @staticmethod
+    # Манхэттенское расстояние: |c1-c2| + |r1-r2|
+    # O(1)
     def _manhattan(a, b):
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
     @staticmethod
+    # O(1) — максимум 4 соседа
     def _neighbors(node, game_map, bomb_set):
         c, r = node
         for dc, dr in ((0, -1), (0, 1), (-1, 0), (1, 0)):
@@ -51,6 +57,7 @@ class AStar:
             yield (nc, nr)
 
     @staticmethod
+    # O(L) — L = длина пути
     def _reconstruct(came_from, current):
         path = [current]
         while came_from[current] is not None:

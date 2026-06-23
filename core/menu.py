@@ -10,12 +10,14 @@ CHOICES = ['Нет', 'Player', 'AI']
 
 class Menu:
 
+    # O(1)
     def __init__(self):
         self.slot = 0
         self.selections = [1, 1, 2, 0]  # Player, Player, AI, Нет
         self.slot_font = pygame.font.Font(None, 48)
         self.choice_font = pygame.font.Font(None, 42)
 
+    # O(1) — 4 элемента
     def get_config(self):
         result = []
         for s in self.selections:
@@ -27,6 +29,7 @@ class Menu:
                 result.append('ai')
         return result
 
+    # O(1)
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
@@ -44,6 +47,7 @@ class Menu:
                 return 'quit'
         return None
 
+    # O(1) — 4 слота × 3 выбора = 12 итераций
     def render(self, screen):
         bg = Sprites.bg_menu
         if bg:

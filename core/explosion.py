@@ -5,14 +5,17 @@ from .sprites import Sprites
 
 class Explosion():
 
+    # O(1)
     def __init__(self, segments):
         self.segments = segments
         self.timer = EXPLOSION_DURATION
 
+    # O(1)
     def update(self):
         self.timer -= 1
         return self.timer <= 0
 
+    # O(S) — S = количество сегментов взрыва
     def render(self, screen):
         Sprites.ensure()
         for col, row in self.segments:

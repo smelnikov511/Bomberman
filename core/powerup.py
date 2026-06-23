@@ -14,6 +14,7 @@ POWERUP_COLOURS = {
 
 class PowerUp:
 
+    # O(1)
     def __init__(self, col, row, ptype):
         self.col = col
         self.row = row
@@ -22,12 +23,15 @@ class PowerUp:
         self.pixel_y = row * TILE_SIZE
 
     @classmethod
+    # Спавн пауэрапа: шанс POWERUP_DROP_CHANCE (30%), случайный тип SPEED/FIRE/BOMB
+    # O(1)
     def try_spawn(cls, col, row):
         if random.random() < POWERUP_DROP_CHANCE:
             ptype = random.choice(list(PowerUpType))
             return cls(col, row, ptype)
         return None
 
+    # O(1)
     def apply(self, player):
         if self.ptype == PowerUpType.SPEED:
             player.speed += SPEED_BOOST
@@ -36,9 +40,11 @@ class PowerUp:
         elif self.ptype == PowerUpType.BOMB:
             player.max_bombs += BOMB_BOOST
 
+    # O(1)
     def rect(self):
         return pygame.Rect(self.pixel_x, self.pixel_y, TILE_SIZE, TILE_SIZE)
 
+    # O(1)
     def render(self, screen):
         Sprites.ensure()
         spr = Sprites.powerup[self.ptype]

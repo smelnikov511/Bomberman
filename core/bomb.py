@@ -10,6 +10,7 @@ from .sprites import Sprites
 
 class Bomb():
 
+    # O(1)
     def __init__(self, row, col, bomb_range, owner):
         self.row = row
         self.col = col
@@ -22,6 +23,7 @@ class Bomb():
         self.owner_can_pass = True  # владелец может пройти через бомбу
     
     # Обновление состояния бомбы: уменьшаем таймер, если время вышло — взрываем
+    # O(1)
     def update(self, game_map, entities, bombs, powerups):
         if self.exploded:
             return None
@@ -30,7 +32,9 @@ class Bomb():
             return None
         return self.explode(game_map, entities, bombs, powerups)
 
-    # Распространение огня
+    # Распространение взрыва: 4 направления от бомбы до HARD_WALL/SOFT_WALL,
+    # разрушение стен, спавн пауэрапов, цепная реакция, урон сущностям
+    # O(R + B + E + P) — R = радиус, B = бомбы, E = сущности, P = пауэрапы
     def explode(self, game_map, entities, bombs, powerups):
         self.exploded = True
         self.owner.active_bomb -= 1
@@ -61,6 +65,7 @@ class Bomb():
                 # if tile == EMPTY
                 segments.append((c, r))
     
+        # Цепная реакция: если сегмент взрыва достиг другой бомбы — взрываем рекурсивно
         for bomb in bombs[:]:
             if bomb is self or bomb.exploded:
                 continue
@@ -87,6 +92,7 @@ class Bomb():
 
         return Explosion(segments)
     
+    # O(1)
     def render(self, screen):
         Sprites.ensure()
         if Sprites.bomb:

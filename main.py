@@ -4,12 +4,11 @@ from core.bomb import Bomb
 from core.config import *
 from core.enemy import Enemy
 from core.explosion import Explosion
-from core.game_over import GameOver
 from core.map import Map
 from core.menu import Menu
 from core.player import Player
+from core.result_screen import ResultScreen
 from core.sprites import Sprites
-from core.win import Win
 
 
 pygame.init()
@@ -33,6 +32,7 @@ PLAYER_KEYS = [
 ]
 
 
+# O(1) — максимум 4 сущности
 def reset_game(config):
     players = []
     enemies = []
@@ -54,13 +54,13 @@ def reset_game(config):
     return Map(), players, enemies, [], [], []
 
 
+# O(F) — F = количество кадров
 def main():
     global screen
 
     state = GameState.MENU
     menu = Menu()
-    game_over = GameOver()
-    win_screen = Win()
+    result_screen = ResultScreen()
     game_map = players = enemies = bombs = explosions = powerups = None
     death_timer = 0
     winner_text = "ПОБЕДА!"
@@ -176,11 +176,13 @@ def main():
                 render_surface.blit(text, text_rect)
 
         elif state == GameState.GAME_OVER:
-            game_over.render(render_surface)
+            result_screen.render(render_surface, Sprites.bg_gameover, (40, 10, 10), "GAME OVER")
         elif state == GameState.WIN:
-            win_screen.render(render_surface, winner_text)
+            result_screen.render(render_surface, Sprites.bg_win, (10, 40, 10), winner_text)
 
         screen.fill((0, 0, 0))
+        # Масштабирование с сохранением пропорций:
+        # scale = min(sw/W, sh/H), центрирование с letterbox
         sw, sh = screen.get_size()
         scale = min(sw / WINDOW_WIDTH, sh / WINDOW_HEIGHT)
         scaled_w = int(WINDOW_WIDTH * scale)

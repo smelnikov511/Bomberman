@@ -4,6 +4,7 @@ from .config import TileType, COLOURS
 from .sprites import Sprites
 
 
+# O(1)
 def render_tile(screen, tile_type, x, y, tile_size):
     Sprites.ensure()
     if tile_type == TileType.HARD_WALL:

@@ -15,6 +15,7 @@ DIR_TO_INDEX = {
 
 class Entity():
 
+    # O(1)
     def __init__(self, col, row, colour):
         self.col = col
         self.row = row
@@ -33,6 +34,7 @@ class Entity():
         self.anim_frame = 0
         self.anim_timer = 0
 
+    # O(1)
     def rect(self):
         """Возвращает хитбокс (pygame.Rect) с учётом отступа."""
         return pygame.Rect(
@@ -42,6 +44,9 @@ class Entity():
             TILE_SIZE - 2 * self.margin
         )
     
+    # AABB collision detection: стены (3×3 окрестность) + бомбы
+    # (owner_can_pass + current_rect bypass) + границы карты
+    # O(B) — B = количество бомб
     def _collides_with(self, x, y, game_map, obstacles):
         test_rect = pygame.Rect(
             x + self.margin, y + self.margin,
@@ -97,6 +102,7 @@ class Entity():
         return False
 
 
+    # O(B) — B = количество бомб
     def move(self, x, y, game_map, obstacles):
         if x == 0 and y == 0:
             return
@@ -112,12 +118,14 @@ class Entity():
         self.col = round(self.pixel_x / TILE_SIZE)
         self.row = round(self.pixel_y / TILE_SIZE)
     
+    # O(1)
     def _snap_to_grid(self):
         if self.direction in (Direction.UP, Direction.DOWN):
             self.pixel_x = self.col * TILE_SIZE
         elif self.direction in (Direction.LEFT, Direction.RIGHT):
             self.pixel_y = self.row * TILE_SIZE
 
+    # O(1)
     def _update_animation(self, moved):
         if moved:
             if self.anim_frame == 0:
@@ -132,6 +140,7 @@ class Entity():
             self.anim_frame = 0
             self.anim_timer = 0
 
+    # O(1)
     def get_current_sprite(self):
         dir_idx = DIR_TO_INDEX.get(self.direction, 0)
         walk_frames = Sprites.player_walk[self.sprite_index][dir_idx]
@@ -143,10 +152,12 @@ class Entity():
         else:
             return walk_frames[1] or stand
 
+    # O(1)
     def die(self):
         self.alive = False
         self.death_timer = 120
     
+    # O(1)
     def render(self, screen):
         if not self.alive and self.death_timer <= 0:
             return

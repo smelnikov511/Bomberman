@@ -9,6 +9,7 @@ tile_size = TILE_SIZE
 
 class Map():
 
+    # O(1) — сетка 17×15 (255 клеток)
     def __init__(self):
         self.cols = COLS
         self.rows = ROWS
@@ -18,6 +19,9 @@ class Map():
         ]
         self.generate_layout()
 
+    # Генерация карты: границы + столбы HARD_WALL, SOFT_WALL c density=0.75,
+    # 4 safe zone 2×2 для спавна игроков
+    # O(1) — двойной цикл по 17×15
     def generate_layout(self):
         for row in range(self.rows):
             for col in range(self.cols):
@@ -38,15 +42,18 @@ class Map():
                     if random.random() < box_density:
                         self.grid[row][col] = TileType.SOFT_WALL
 
+    # O(1)
     def destroy_soft_wall(self, col, row):
         if self.grid[row][col] == TileType.SOFT_WALL:
             self.grid[row][col] = TileType.EMPTY
             return True
         return False
     
+    # O(1)
     def is_within_bounds(self, col, row):
         return 0 <= col < self.cols and 0 <= row < self.rows
 
+    # O(1) — цикл по 255 клеткам
     def render(self, screen):
         for row in range(self.rows):
             for col in range(self.cols):

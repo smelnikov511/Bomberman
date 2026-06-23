@@ -21,6 +21,7 @@ win_h = int(WINDOW_HEIGHT * scale)
 screen = pygame.display.set_mode((win_w, win_h), pygame.RESIZABLE)
 render_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
 clock = pygame.time.Clock()
+Sprites.ensure()
 
 SPAWNS = [(1, 1), (15, 13), (1, 11), (13, 1)]
 PLAYER_COLOURS = [COLOURS['BLUE'], COLOURS['ORANGE'], COLOURS['RED'], COLOURS['PINK']]
@@ -33,7 +34,6 @@ PLAYER_KEYS = [
 
 
 def reset_game(config):
-    Sprites.ensure()
     players = []
     enemies = []
     for i, choice in enumerate(config):
@@ -85,8 +85,11 @@ def main():
 
                 elif state == GameState.PLAYING and event.key == pygame.K_ESCAPE:
                     state = GameState.PAUSE
-                elif state == GameState.PAUSE and event.key == pygame.K_ESCAPE:
-                    state = GameState.PLAYING
+                elif state == GameState.PAUSE:
+                    if event.key == pygame.K_ESCAPE:
+                        state = GameState.MENU
+                    elif event.key in (pygame.K_SPACE, pygame.K_RETURN):
+                        state = GameState.PLAYING
 
                 elif state in (GameState.GAME_OVER, GameState.WIN):
                     if event.key == pygame.K_SPACE:

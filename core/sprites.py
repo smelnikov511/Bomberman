@@ -1,7 +1,7 @@
 import os
 import pygame
 
-from .config import PowerUpType, TILE_SIZE
+from .config import PowerUpType, TILE_SIZE, WINDOW_WIDTH, WINDOW_HEIGHT
 
 SPRITE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "sprites")
 
@@ -21,6 +21,9 @@ class Sprites:
         cls.bomb = cls._load("bomb.png")
         cls.explosion = cls._load("explosion.png")
         cls.player_dead = cls._load("player_dead.png")
+        cls.bg_menu = cls._load("background_menu.png", (WINDOW_WIDTH, WINDOW_HEIGHT))
+        cls.bg_win = cls._load("background_win.png", (WINDOW_WIDTH, WINDOW_HEIGHT))
+        cls.bg_gameover = cls._load("background_gameover.png", (WINDOW_WIDTH, WINDOW_HEIGHT))
         cls.powerup = {
             PowerUpType.SPEED: cls._load("powerup_speed.png"),
             PowerUpType.FIRE: cls._load("powerup_fire.png"),
@@ -37,11 +40,12 @@ class Sprites:
         cls._loaded = True
 
     @classmethod
-    def _load(cls, path):
+    def _load(cls, path, size=None):
         full = os.path.join(SPRITE_DIR, path)
         if os.path.exists(full):
             img = pygame.image.load(full).convert_alpha()
-            if img.get_width() != TILE_SIZE:
-                img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
+            target = size or (TILE_SIZE, TILE_SIZE)
+            if img.get_width() != target[0]:
+                img = pygame.transform.scale(img, target)
             return img
         return None

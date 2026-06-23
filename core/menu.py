@@ -1,6 +1,7 @@
 import pygame
 
 from .config import COLOURS, WINDOW_WIDTH, WINDOW_HEIGHT
+from .sprites import Sprites
 
 
 LABELS = ['Player 1', 'Player 2', 'Player 3', 'Player 4']
@@ -12,7 +13,6 @@ class Menu:
     def __init__(self):
         self.slot = 0
         self.selections = [1, 1, 2, 0]  # Player, Player, AI, Нет
-        self.title_font = pygame.font.Font(None, 80)
         self.slot_font = pygame.font.Font(None, 48)
         self.choice_font = pygame.font.Font(None, 42)
 
@@ -45,13 +45,13 @@ class Menu:
         return None
 
     def render(self, screen):
-        screen.fill(COLOURS['PURPLE'])
+        bg = Sprites.bg_menu
+        if bg:
+            screen.blit(bg, (0, 0))
+        else:
+            screen.fill(COLOURS['PURPLE'])
 
-        title = self.title_font.render("BOMBERMAN", True, COLOURS['GREEN'])
-        title_rect = title.get_rect(center=(WINDOW_WIDTH // 2, 120))
-        screen.blit(title, title_rect)
-
-        start_y = 260
+        start_y = 920
         row_h = 70
 
         for i in range(4):
@@ -59,22 +59,22 @@ class Menu:
 
             colour = COLOURS['YELLOW'] if i == self.slot else COLOURS['WHITE']
             label = self.slot_font.render(LABELS[i], True, colour)
-            screen.blit(label, (150, y))
+            screen.blit(label, (1020, y))
 
             for j, choice in enumerate(CHOICES):
-                x = 480 + j * 150
+                x = 1200 + j * 150
                 if j == self.selections[i] and i == self.slot:
                     c = COLOURS['YELLOW']
                     text = f"[{choice}]"
                 elif j == self.selections[i]:
-                    c = COLOURS['GREEN']
-                    text = f" {choice} "
+                    c = COLOURS['WHITE']
+                    text = f"[{choice}]"
                 else:
-                    c = COLOURS['GREY']
+                    c = COLOURS['WHITE']
                     text = f" {choice} "
                 rendered = self.choice_font.render(text, True, c)
                 screen.blit(rendered, (x, y))
 
-        hint = self.choice_font.render("SPACE — старт, ESC — выход", True, COLOURS['GREY'])
+        hint = self.choice_font.render("SPACE — старт, ESC — выход", True, COLOURS['WHITE'])
         hint_rect = hint.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 60))
         screen.blit(hint, hint_rect)
